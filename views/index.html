@@ -1,0 +1,39 @@
+<!doctype html>
+<html>
+   <head>
+	<title>Socket.IO chat</title>
+	<link rel="stylesheet" type="text/css" href="styles/style.css">
+   </head>
+   <body>
+	<ul id="messages"></ul>
+	<form action="">
+		<input id="m" autocomplete="off" />
+		<button>Send</button>
+	</form>
+   	<script src="/socket.io/socket.io.js"></script>
+   	<script src="http://code.jquery.com/jquery-1.11.1.js"></script>
+   	<script>
+		var socket = io();
+		var login = prompt("Inserte su nick", "anonymous");
+		console.log('user ' + login);
+		socket.emit('login', login);
+
+		$('form').submit(function() {
+			socket.emit('chat message', { val: $('#m').val(), login: login });
+			$('#m').val('');
+			return false;
+		});	
+		socket.on('chat message', function(msg) {
+			if (msg.login !== login) {	
+				$('#messages').append($('<li>').text('('+ msg.login + ')' + ' ' + msg.val));
+			}
+		});
+		socket.on('connected', function(msg) {
+			$('#messages').append($('<li>').text(msg + ' connected'));
+		});
+		//socket.on('disconnected', function(msg) {
+		//	$('#messages').append($('<li>').text(msg + ' user disconnected'));
+		//});
+   	</script>
+   </body>
+</html>
